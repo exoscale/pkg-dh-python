@@ -1,3 +1,9 @@
+dh-python (1.20140128-1ubuntu8~cloud1+exo1) precise; urgency=medium
+
+  * Release for Exoscale.
+
+ -- Vincent Bernat <bernat@debian.org>  Sun, 25 Oct 2015 12:21:56 +0100
+
 dh-python (1.20140128-1ubuntu8~cloud1) precise-icehouse; urgency=medium
 
   * d/p/disable-rename.patch: Don't rename extensions by default as this
