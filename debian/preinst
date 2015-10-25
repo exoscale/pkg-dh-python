@@ -14,7 +14,7 @@ divert() {
 
 if [ install = "$1" ]; then
 	divert
-elif [ upgrade = "$1" ] && dpkg --compare-versions "$2" lt '1.20130819-1~bpo70+1'; then
+elif [ upgrade = "$1" ] && dpkg --compare-versions "$2" lt '1.20131003-1~cloud0'; then
 	divert
 fi
 

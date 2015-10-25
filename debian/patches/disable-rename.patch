@@ -1,8 +1,6 @@
-diff --git a/dh_python2 b/dh_python2
-index 8279047..1a6123e 100755
 --- a/dh_python2
 +++ b/dh_python2
-@@ -323,7 +323,7 @@ def main():
+@@ -325,7 +325,7 @@ def main():
                        dest='clean_dbg_pkg', default=True,
                        help='do not remove files from debug packages')
      parser.add_option('--no-ext-rename', action='store_true',

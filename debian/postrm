@@ -12,11 +12,9 @@ remove_divert() {
 	  --divert /usr/share/man/man1/dh_python2.real.1.gz /usr/share/man/man1/dh_python2.1.gz
 }
 
-if [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt '1.20130819-1~bpo70+1'; then
+if [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt '1.20131003-1~cloud0'; then
 	remove_divert
 elif [ remove = "$1" -o abort-install = "$1" ]; then
-	remove_divert
-elif [ upgrade = "$1" ] && echo "$2" | grep -vq '~bpo'; then
 	remove_divert
 fi
 

@@ -1,10 +1,10 @@
 Source: dh-python
 Section: python
 Priority: optional
-Maintainer: Piotr Ożarowski <piotr@debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Piotr Ożarowski <piotr@debian.org>
 Uploaders: Stefano Rivera <stefanor@debian.org>, Barry Warsaw <barry@debian.org>
-Build-Depends: debhelper (>= 9), python3-minimal,
- python3.2,
+Build-Depends: debhelper (>= 9), python3-minimal, python3.2,
 # provides rst2man command (python3-docutils not used to avoid circular deps):
  python-docutils
 Standards-Version: 3.9.5
@@ -15,7 +15,8 @@ XS-Testsuite: autopkgtest
 
 Package: dh-python
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}, python3 (>= 3.2.3-0~)
+Multi-Arch: foreign
 Description: Debian helper tools for packaging Python libraries and applications
  This package contains:
   * pybuild - invokes various build systems for requested Python versions in

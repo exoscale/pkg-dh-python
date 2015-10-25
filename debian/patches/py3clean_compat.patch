@@ -1,0 +1,11 @@
+--- a/dhpython/__init__.py
++++ b/dhpython/__init__.py
+@@ -98,7 +98,7 @@ if [ "$1" = rtupdate ]; then
+ fi''',
+     'cpython3': '''
+ if [ "$1" = rtupdate ]; then
+-\tpy3clean {pkg_arg} {dname}
++\tpy3clean {pkg_arg}
+ \tpy3compile {pkg_arg} {args} {dname}
+ fi''',
+     'pypy': ''

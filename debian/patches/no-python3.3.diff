@@ -1,0 +1,147 @@
+Index: b/dhpython/interpreter.py
+===================================================================
+--- a/dhpython/interpreter.py
++++ b/dhpython/interpreter.py
+@@ -309,8 +309,8 @@
+         >>> i = Interpreter('python')
+         >>> i.cache_file('foo.py', Version('3.1'))
+         'foo.pyc'
+-        >>> i.cache_file('bar/foo.py', '3.3')
+-        'bar/__pycache__/foo.cpython-33.pyc'
++        >>> i.cache_file('bar/foo.py', '3.4')
++        'bar/__pycache__/foo.cpython-34.pyc'
+         """
+         version = Version(version or self.version)
+         last_char = 'o' if '-O' in self.options else 'c'
+@@ -335,8 +335,8 @@
+         """Return Python magic tag (used in __pycache__ dir to tag files).
+ 
+         >>> i = Interpreter('python')
+-        >>> i.magic_tag(version='3.3')
+-        'cpython-33'
++        >>> i.magic_tag(version='3.4')
++        'cpython-34'
+         """
+         version = Version(version or self.version)
+         if self.impl.startswith('cpython') and version << Version('3.2'):
+@@ -378,8 +378,8 @@
+ 
+         >>> Interpreter('python2.7').include_dir
+         '/usr/include/python2.7'
+-        >>> Interpreter('python3.3-dbg').include_dir
+-        '/usr/include/python3.3dm'
++        >>> Interpreter('python3.4-dbg').include_dir
++        '/usr/include/python3.4dm'
+         """
+         if self.impl == 'pypy':
+             return '/usr/lib/pypy/include'
+@@ -482,7 +482,7 @@
+ 
+         >>> Interpreter('python3.1').suggest_pkg_name('foo')
+         'python3-foo'
+-        >>> Interpreter('python3.3').suggest_pkg_name('foo')
++        >>> Interpreter('python3.4').suggest_pkg_name('foo')
+         'python3-foo'
+         >>> Interpreter('python2.7-dbg').suggest_pkg_name('bar')
+         'python-bar-dbg'
+Index: b/pybuild
+===================================================================
+--- a/pybuild
++++ b/pybuild
+@@ -102,7 +102,7 @@
+ 
+     def get_option(name, interpreter=None, version=None, default=None):
+         if interpreter:
+-            # try PYBUILD_NAME_python3.3-dbg (or hardcoded interpreter)
++            # try PYBUILD_NAME_python3.4-dbg (or hardcoded interpreter)
+             i = interpreter.format(version=version or '')
+             opt = "PYBUILD_{}_{}".format(name.upper(), i)
+             if opt in environ:
+Index: b/pybuild.rst
+===================================================================
+--- a/pybuild.rst
++++ b/pybuild.rst
+@@ -191,8 +191,8 @@
+ * `--disable test/python2.5-dbg` - disables tests for python2.5-dbg
+ * `--disable '2.4 2.7'` - disables all actions for version 2.4 and 2.7
+ * `PYBUILD_DISABLE_python2=1` - disables all actions for Python 2.X
+-* `PYBUILD_DISABLE_python3.3=test` - disables tests for Python 3.3
+-* `PYBUILD_DISABLE=test/python3.3` - same as above
++* `PYBUILD_DISABLE_python3.4=test` - disables tests for Python 3.3
++* `PYBUILD_DISABLE=test/python3.4` - same as above
+ * `PYBUILD_DISABLE=configure/python3 2.4 pypy` - disables configure
+   action for all python3 interpreters, all actions for version 2.4, and
+   all actions for pypy
+Index: b/tests/t304/Makefile
+===================================================================
+--- a/tests/t304/Makefile
++++ b/tests/t304/Makefile
+@@ -6,10 +6,10 @@
+ check:
+ 	# python3.2 hardcoded via `dh_python3 --shebang ...python3.2`
+ 	grep -q '#! /usr/bin/python3.2 -OO' debian/foo/usr/share/baz32/baz.py
+-	# python3.3 hardcoded via shebang
+-	grep -q '/usr/share/foo \-V 3.3' debian/foo/DEBIAN/postinst
++	# python3.4 hardcoded via shebang
++	grep -q '/usr/share/foo \-V 3.4' debian/foo/DEBIAN/postinst
+ 	# /env removed from shebang 
+ 	grep -q '#! /usr/bin/python3' debian/foo/usr/share/bar/bar.py
+ 	# /local removed from shebang 
+ 	grep -q '#! /usr/bin/python3' debian/foo/usr/share/foo/baz.py
+-	grep -q '#! /usr/bin/python3.3' debian/foo/usr/share/foo/foo.py
++	grep -q '#! /usr/bin/python3.4' debian/foo/usr/share/foo/foo.py
+Index: b/tests/t304/foo.py
+===================================================================
+--- a/tests/t304/foo.py
++++ b/tests/t304/foo.py
+@@ -1,2 +1,2 @@
+-#!/usr/local/bin/python3.3
+-"/usr/local/bin/python3.3 hardcoded in shebang"
++#!/usr/local/bin/python3.4
++"/usr/local/bin/python3.4 hardcoded in shebang"
+Index: b/tests/test_interpreter.py
+===================================================================
+--- a/tests/test_interpreter.py
++++ b/tests/test_interpreter.py
+@@ -93,26 +93,26 @@
+         self.assertIsNone(i.check_extname('foo.abi3.so'))
+         self.assertEqual(i.check_extname('foo/bar/bazmodule.so'), r'foo/bar/bazmodule.cpython-32dmu.so')
+ 
+-    @unittest.skipUnless(exists('/usr/bin/python3.3'), 'python3.3 is not installed')
+-    def test_python33(self):
+-        i = Interpreter('python3.3')
+-        self.assertEqual(i.soabi(), 'cpython-33m')
+-        self.assertEqual(i.check_extname('foo.so'), r'foo.cpython-33m-MYARCH.so')
++    @unittest.skipUnless(exists('/usr/bin/python3.4'), 'python3.4 is not installed')
++    def test_python34(self):
++        i = Interpreter('python3.4')
++        self.assertEqual(i.soabi(), 'cpython-34m')
++        self.assertEqual(i.check_extname('foo.so'), r'foo.cpython-34m-MYARCH.so')
+         self.assertIsNone(i.check_extname('foo.cpython-32m.so'))  # different version
+-        self.assertIsNone(i.check_extname('foo.cpython-33m-OTHER.so'))  # different architecture
+-        self.assertEqual(i.check_extname('foo.cpython-33m.so'), r'foo.cpython-33m-MYARCH.so')
++        self.assertIsNone(i.check_extname('foo.cpython-34m-OTHER.so'))  # different architecture
++        self.assertEqual(i.check_extname('foo.cpython-34m.so'), r'foo.cpython-34m-MYARCH.so')
+         self.assertIsNone(i.check_extname('foo.abi3.so'))
+-        self.assertEqual(i.check_extname('foo/bar/bazmodule.so'), r'foo/bar/baz.cpython-33m-MYARCH.so')
++        self.assertEqual(i.check_extname('foo/bar/bazmodule.so'), r'foo/bar/baz.cpython-34m-MYARCH.so')
+ 
+-    @unittest.skipUnless(exists('/usr/bin/python3.3-dbg'), 'python3.3-dbg is not installed')
+-    def test_python33dbg(self):
+-        i = Interpreter('python3.3-dbg')
+-        self.assertEqual(i.soabi(), 'cpython-33dm')
+-        self.assertEqual(i.check_extname('foo.so'), r'foo.cpython-33dm-MYARCH.so')
++    @unittest.skipUnless(exists('/usr/bin/python3.4-dbg'), 'python3.4-dbg is not installed')
++    def test_python34dbg(self):
++        i = Interpreter('python3.4-dbg')
++        self.assertEqual(i.soabi(), 'cpython-34dm')
++        self.assertEqual(i.check_extname('foo.so'), r'foo.cpython-34dm-MYARCH.so')
+         self.assertIsNone(i.check_extname('foo.cpython-32m.so'))  # different version
+-        self.assertIsNone(i.check_extname('foo.cpython-33m-OTHER.so'))  # different architecture
++        self.assertIsNone(i.check_extname('foo.cpython-34m-OTHER.so'))  # different architecture
+         self.assertIsNone(i.check_extname('foo.abi3.so'))
+-        self.assertEqual(i.check_extname('foo/bar/bazmodule.so'), r'foo/bar/baz.cpython-33dm-MYARCH.so')
++        self.assertEqual(i.check_extname('foo/bar/bazmodule.so'), r'foo/bar/baz.cpython-34dm-MYARCH.so')
+ 
+     def test_version(self):
+         i = Interpreter(impl='cpython2')
